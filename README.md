@@ -28,7 +28,10 @@ This project scaffolds a voice-first, multi-agent assistant that helps users dis
    pip install -r requirements.txt
    ```
 2. Copy `.env.example` to `.env` and populate provider-specific secrets.
-3. Run preprocessing and index building (to be implemented) before starting the MCP server or UI.
+3. Run preprocessing and index building before starting the MCP server or UI:
+   ```bash
+   python -m src.scripts.build_index --rebuild
+   ```
 4. Launch the Streamlit UI:
    ```bash
    streamlit run src/ui/app.py

@@ -6,3 +6,6 @@ pandas
 httpx
 python-dotenv
 numpy
+chromadb
+openai
+pyarrow
