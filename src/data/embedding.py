@@ -25,13 +25,11 @@ logger = logging.getLogger(__name__)
 
 EmbeddingBackend = Literal["openai", "dummy"]
 
+# Cleaned dataframe schema is expected to include only these text columns.
 TEXT_COLUMNS: Sequence[str] = (
-    "Product Name",
-    "Product Description",
-    "About Product",
-    "Product Specification",
-    "Technical Details",
-    "Ingredients",
+    "title",
+    "brand",
+    "category",
 )
 
 
@@ -82,10 +80,11 @@ def get_embedding_function(backend: EmbeddingBackend = "openai") -> Callable[[Se
 
 
 def _make_document(row: pd.Series) -> str:
-    """Combine configured text columns into a single embedding document.
+    """Combine cleaned text fields into a single embedding document.
 
-    "Product Name" alone is considered sufficient for indexing. Additional
-    descriptive fields are appended when present.
+    The cleaned dataframe is expected to have ``title``, ``brand``, and
+    ``category`` columns. Any non-empty values are joined with ``|`` to form a
+    compact representation suitable for embedding.
     """
 
     parts: List[str] = []
@@ -93,11 +92,9 @@ def _make_document(row: pd.Series) -> str:
         if col in row.index:
             val = row[col]
             if pd.notna(val):
-                parts.append(str(val))
-
-    # Fallback: ensure Product Name is kept even if other fields are empty
-    if not parts and pd.notna(row.get("Product Name")):
-        parts.append(str(row["Product Name"]))
+                text = str(val).strip()
+                if text:
+                    parts.append(text)
 
     return " | ".join(parts).strip()
 
@@ -130,17 +127,13 @@ def build_vector_index(df: pd.DataFrame, index_dir: Path, collection_name: str =
         if not doc:
             continue
 
-        product_id = row.get("Asin") or row.get("Unig Id") or idx
+        product_id = row.get("title") or idx
         product_id_str = str(product_id)
 
         metadata = {
-            "asin": row.get("Asin") if pd.notna(row.get("Asin")) else None,
-            "unig_id": row.get("Unig Id") if pd.notna(row.get("Unig Id")) else None,
-            "product_name": row.get("Product Name") if pd.notna(row.get("Product Name")) else None,
-            "brand": row.get("Brand Name") if pd.notna(row.get("Brand Name")) else None,
-            "category": row.get("Category") if pd.notna(row.get("Category")) else None,
-            "list_price": float(row["List Price"]) if "List Price" in row and pd.notna(row["List Price"]) else None,
-            "rating": float(row["Average Rating"]) if "Average Rating" in row and pd.notna(row["Average Rating"]) else None,
+            "title": row.get("title") if pd.notna(row.get("title")) else None,
+            "brand": row.get("brand") if pd.notna(row.get("brand")) else None,
+            "category": row.get("category") if pd.notna(row.get("category")) else None,
         }
 
         valid_ids.append(product_id_str)
