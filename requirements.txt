@@ -9,3 +9,4 @@ numpy
 chromadb
 openai
 pyarrow
+tavily-python
