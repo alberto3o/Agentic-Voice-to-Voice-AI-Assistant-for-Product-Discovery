@@ -23,10 +23,10 @@ def rag_search_tool(query: str, top_k: int = 5) -> Dict:
 
 
 @app.tool(name="web.search")
-def web_search_tool(query: str, k: int = 5) -> Dict:
+def web_search_tool(query: str, top_k: int = 5) -> Dict:
     """Bridge decorator to expose live web search via MCP."""
 
-    return web_search(query=query, k=k)
+    return web_search(query=query, top_k=top_k)
 
 
 if __name__ == "__main__":  # pragma: no cover
