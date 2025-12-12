@@ -74,10 +74,14 @@ def build_vector_index(
             continue
 
         doc_id = f"prod-{idx}"
+       
         metadata = {
             "title": row.get("title"),
             "brand": row.get("brand"),
             "category": row.get("category"),
+            "price": float(row.get("price")) if pd.notna(row.get("price")) else None,
+            "rating": float(row.get("rating")) if pd.notna(row.get("rating")) else None,
+            "features": str(row.get("features")) if pd.notna(row.get("features")) else None,
         }
 
         valid_ids.append(doc_id)
