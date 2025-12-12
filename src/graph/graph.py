@@ -1,15 +1,18 @@
-"""LangGraph assembly for the agentic product discovery assistant."""
+# Cell 2.1: 修复 graph.py - 添加TypedDict
+
+graph_py_fixed = '''"""LangGraph assembly for the agentic product discovery assistant."""
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
+from typing_extensions import TypedDict
 
 from langgraph.graph import END, StateGraph
 
 from src.graph.nodes import answerer_node, planner_node, retriever_node, router_node
 
 
-class ConversationState(Dict[str, Any]):
-    """Simple state container for LangGraph execution.
+class ConversationState(TypedDict, total=False):
+    """State container for LangGraph execution.
     
     State fields:
         user_query: str - Original user query
@@ -27,7 +30,20 @@ class ConversationState(Dict[str, Any]):
         timestamp: Optional[str] - ISO format timestamp
         node_logs: Optional[List[str]] - Execution trace logs
     """
-    pass
+    user_query: str
+    intent: Optional[Dict]
+    constraints: Optional[Dict]
+    safety_flags: Optional[List[str]]
+    plan: Optional[List[str]]
+    search_strategy: Optional[str]
+    search_params: Optional[Dict]
+    rag_results: Optional[List[Dict]]
+    web_results: Optional[List[Dict]]
+    reconciled_results: Optional[List[Dict]]
+    final_answer: Optional[Dict]
+    citations: Optional[List[Dict]]
+    timestamp: Optional[str]
+    node_logs: Optional[List[str]]
 
 
 def should_continue_after_router(state: ConversationState) -> str:
@@ -93,4 +109,18 @@ def build_graph() -> StateGraph:
 
 # Create the compiled agent instance
 agent = build_graph()
+'''
 
+# 写入文件
+with open('src/graph/graph.py', 'w') as f:
+    f.write(graph_py_fixed)
+
+print("✅ Fixed src/graph/graph.py")
+
+# 验证
+with open('src/graph/graph.py', 'r') as f:
+    content = f.read()
+    if 'from typing_extensions import TypedDict' in content:
+        print("   ✅ TypedDict import added")
+    if 'class ConversationState(TypedDict, total=False):' in content:
+        print("   ✅ ConversationState is now TypedDict")
