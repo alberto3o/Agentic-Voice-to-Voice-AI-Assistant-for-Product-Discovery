@@ -17,20 +17,28 @@ def _flatten_results(results: Dict[str, Any]) -> List[Dict[str, Any]]:
     metadatas = results.get("metadatas", [[]]) or [[]]
     documents = results.get("documents", [[]]) or [[]]
     distances = results.get("distances", [[]]) or [[]]
+    ids = results.get("ids", [[]]) or [[]]
 
     flat_metadatas = metadatas[0] if metadatas else []
     flat_documents = documents[0] if documents else []
     flat_distances = distances[0] if distances else []
+    flat_ids = ids[0] if ids else []
 
     normalized: List[Dict[str, Any]] = []
-    for metadata, document, distance in zip(flat_metadatas, flat_documents, flat_distances):
+    for metadata, document, distance, doc_id in zip(flat_metadatas, flat_documents, flat_distances, flat_ids):
+
         normalized.append(
             {
+                "product_id": doc_id,
                 "title": metadata.get("title") if metadata else None,
                 "brand": metadata.get("brand") if metadata else None,
                 "category": metadata.get("category") if metadata else None,
+                "price": metadata.get("price") if metadata else None,
+                "rating": metadata.get("rating") if metadata else None,
+                "features": metadata.get("features") if metadata else None,
                 "document": document,
                 "score": distance,
+                "source": "rag" 
             }
         )
 
